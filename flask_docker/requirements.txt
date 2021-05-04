@@ -1,0 +1,6 @@
+flask
+gunicorn
+pymysql
+flask_login
+flask_cors
+pymongo

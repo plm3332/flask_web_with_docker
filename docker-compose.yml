@@ -1,0 +1,42 @@
+version: "3"
+
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports: 
+      - "80:80"
+    depends_on: 
+      - flask
+    volumes:
+      - "./nginx/nginx.conf:/etc/nginx/nginx.conf"
+    restart: always
+
+  flask:
+    build: ./flask_docker
+    container_name: flask
+    restart: always
+    command: gunicorn -w 1 -b 0.0.0.0:8000 wsgi:server
+    links:
+      - "mysqldb:mysqldb"
+      - "mongodb:mongodb"
+
+  mysqldb:
+    image: mysql:5.7
+    container_name: mysqldb
+    restart: always
+    volumes:
+      - "./init/:/docker-entrypoint-initdb.d/"
+      - "./mysqldata:/var/lib/mysql"
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: blog_db
+      MYSQL_USER: plm3332
+      MYSQL_PASSWORD: 1234
+  
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    volumes:
+      - "./mongodata:/data/db"
